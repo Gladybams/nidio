@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nidio — Simulateur de budget logement pour toute la France. Estimez votre loyer, charges, frais d'entrée et reste à vivre en quelques secondes.">
+  <meta property="og:title" content="Nidio — Simulateur budget logement">
+  <meta property="og:description" content="Estimez votre budget logement en France : loyer, charges, APL, frais d'entrée.">
+  <meta property="og:type" content="website">
+  <title>Nidio — Simulateur budget logement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sage: #7A9E7E;
+      --sage-dark: #4A6B4E;
+      --cream: #F7F4EE;
+      --cream-border: #E2DDD4;
+      --text: #2C2C2A;
+      --text-muted: #7A7A72;
+      --text-hint: #A8A8A0;
+      --white: #ffffff;
+    }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #EFEDE7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+    @media (max-width: 480px) { body { padding: 0; background: var(--cream); } }
+
+    .app {
+      background: var(--cream);
+      border-radius: 20px;
+      border: 0.5px solid var(--cream-border);
+      padding: 2rem;
+      width: 100%;
+      max-width: 560px;
+    }
+    @media (max-width: 480px) {
+      .app { border-radius: 0; border: none; padding: 1.25rem 1rem; max-width: 100%; }
+    }
+
+    /* Logo */
+    .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+    .logo-icon {
+      width: 40px; height: 40px; min-width: 40px;
+      background: var(--sage); border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 20px;
+    }
+    .logo-name { font-size: 21px; font-weight: 500; color: var(--text); letter-spacing: -0.3px; }
+    .logo-name span { color: var(--sage); }
+    .logo-tagline { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; background: #E8E4DC; border-radius: 10px; padding: 3px; margin-bottom: 2rem; }
+    .tab {
+      flex: 1; padding: 8px 6px; border: none; background: none;
+      border-radius: 8px; font-size: 13px; font-family: inherit;
+      cursor: pointer; color: var(--text-muted); transition: all 0.15s;
+    }
+    .tab.active { background: var(--white); color: var(--text); font-weight: 500; border: 0.5px solid var(--cream-border); }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Section label */
+    .section-label {
+      font-size: 11px; font-weight: 500; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.07em; margin: 1.5rem 0 0.75rem;
+    }
+
+    /* Fields */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 13px; color: var(--text-muted); }
+    .field input, .field select {
+      background: var(--white); border: 0.5px solid var(--cream-border);
+      border-radius: 8px; padding: 10px 12px; font-size: 16px;
+      font-family: inherit; color: var(--text); width: 100%;
+      outline: none; transition: border 0.15s; -webkit-appearance: none; appearance: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--sage); }
+    .field .hint { font-size: 11px; color: var(--text-hint); }
+    .caf-link { font-size: 11px; color: var(--sage-dark); text-decoration: none; }
+    .caf-link:hover { text-decoration: underline; }
+
+    /* Grids */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    @media (max-width: 480px) {
+      .grid2 { grid-template-columns: 1fr; }
+      .grid3 { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Divider */
+    .divider { border: none; border-top: 0.5px solid var(--cream-border); margin: 1.25rem 0; }
+
+    /* Metrics */
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 1.25rem 0; }
+    .metric { background: var(--white); border: 0.5px solid var(--cream-border); border-radius: 10px; padding: 0.875rem; }
+    .metric-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .metric-value { font-size: 20px; font-weight: 500; color: var(--text); }
+    .metric-value.ok { color: var(--sage-dark); }
+    .metric-value.warn { color: #BA7517; }
+    .metric-value.bad { color: #A32D2D; }
+
+    /* Breakdown */
+    .breakdown { display: flex; flex-direction: column; gap: 5px; }
+    .brow { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; gap: 8px; }
+    .brow span:first-child { color: var(--text-muted); flex: 1; }
+    .brow span:last-child { color: var(--text); font-weight: 500; text-align: right; }
+    .brow.green span { color: var(--sage-dark); }
+    .brow.total { margin-top: 4px; padding-top: 8px; border-top: 0.5px solid var(--cream-border); }
+    .brow.total span { font-size: 14px; font-weight: 500; color: var(--text); }
+
+    /* Alerts */
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; font-size: 13px; margin-top: 1rem; display: flex; gap: 8px; align-items: flex-start; line-height: 1.5; }
+    .alert.ok { background: #EDF2EE; color: var(--sage-dark); }
+    .alert.warn { background: #FAEEDA; color: #854F0B; }
+    .alert.bad { background: #FCEBEB; color: #A32D2D; }
+
+    /* Autres dépenses */
+    .autres-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 0.75rem; }
+    .autre-row { display: grid; grid-template-columns: 1fr 80px 28px; gap: 8px; align-items: center; }
+    .autre-row input {
+      background: var(--white); border: 0.5px solid var(--cream-border);
+      border-radius: 8px; padding: 8px 10px; font-size: 14px;
+      font-family: inherit; color: var(--text); outline: none; width: 100%;
+      -webkit-appearance: none;
+    }
+    .autre-row input:focus { border-color: var(--sage); }
+    .btn-add {
+      background: none; border: 0.5px solid var(--cream-border); border-radius: 8px;
+      padding: 8px 14px; font-size: 13px; font-family: inherit;
+      color: var(--sage-dark); cursor: pointer; display: flex; align-items: center; gap: 6px;
+      touch-action: manipulation;
+    }
+    .btn-add:hover { background: #EDF2EE; }
+    .btn-rm {
+      background: none; border: none; cursor: pointer; color: var(--text-hint);
+      font-size: 16px; padding: 4px; line-height: 1; touch-action: manipulation;
+    }
+    .btn-rm:hover { color: var(--text-muted); }
+
+    /* Mention */
+    .mention { font-size: 11px; color: var(--text-hint); margin-top: 1.5rem; padding-top: 0.75rem; border-top: 0.5px solid var(--cream-border); line-height: 1.6; }
+
+    /* Footer */
+    .footer { margin-top: 1.5rem; font-size: 12px; color: var(--text-hint); text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-home"></i></div>
+    <div>
+      <div class="logo-name">nid<span>io</span></div>
+      <div class="logo-tagline">Simulateur budget logement · France</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('mensuel',this)">Mensuel</button>
+    <button class="tab" onclick="switchTab('entree',this)">Frais d'entrée</button>
+  </div>
+
+  <!-- ONGLET MENSUEL -->
+  <div id="panel-mensuel" class="panel active">
+    <div class="section-label">Logement</div>
+    <div class="grid2">
+      <div class="field"><label>Loyer hors charges (€)</label><input type="number" id="loyer" placeholder="ex: 750" min="0" step="50" inputmode="numeric" oninput="calc()"></div>
+      <div class="field"><label>Charges mensuelles (€)</label><input type="number" id="charges" placeholder="ex: 60" min="0" step="10" inputmode="numeric" oninput="calc()"></div>
+    </div>
+    <div class="grid3">
+      <div class="field"><label>Assurance (€)</label><input type="number" id="assurance" placeholder="ex: 15" min="0" inputmode="numeric" oninput="calc()"><span class="hint">8–25€ moy.</span></div>
+      <div class="field"><label>Internet (€)</label><input type="number" id="internet" placeholder="ex: 25" min="0" inputmode="numeric" oninput="calc()"><span class="hint">15–40€</span></div>
+      <div class="field"><label>Électricité / gaz (€)</label><input type="number" id="energie" placeholder="ex: 60" min="0" inputmode="numeric" oninput="calc()"><span class="hint">40–80€</span></div>
+    </div>
+
+    <div class="section-label">Autres dépenses</div>
+    <div class="autres-list" id="autres-list"></div>
+    <button class="btn-add" onclick="addAutre()"><i class="ti ti-plus"></i> Ajouter une dépense</button>
+
+    <div class="section-label" style="margin-top:1.5rem">Revenus & aides</div>
+    <div class="grid2">
+      <div class="field"><label>Revenu mensuel net (€)</label><input type="number" id="revenu" placeholder="ex: 1800" min="0" step="100" inputmode="numeric" oninput="calc()"></div>
+      <div class="field"><label>APL estimée (€/mois)</label><input type="number" id="apl" placeholder="ex: 120" min="0" step="10" inputmode="numeric" oninput="calc()"><span class="hint"><a class="caf-link" href="https://www.caf.fr" target="_blank" rel="noopener">Simuler sur caf.fr ↗</a></span></div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label" style="margin-top:0">Résultat</div>
+
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Coût total brut</div><div class="metric-value" id="cout-total">—</div></div>
+      <div class="metric"><div class="metric-label">Après APL</div><div class="metric-value" id="cout-apl">—</div></div>
+      <div class="metric"><div class="metric-label">% du revenu</div><div class="metric-value" id="ratio">—</div></div>
+      <div class="metric"><div class="metric-label">Reste à vivre</div><div class="metric-value" id="reste">—</div></div>
+    </div>
+
+    <div class="breakdown">
+      <div class="brow"><span>Loyer HC</span><span id="b-loyer">—</span></div>
+      <div class="brow"><span>Charges</span><span id="b-charges">—</span></div>
+      <div class="brow"><span>Assurance</span><span id="b-assurance">—</span></div>
+      <div class="brow"><span>Internet</span><span id="b-internet">—</span></div>
+      <div class="brow"><span>Électricité / gaz</span><span id="b-energie">—</span></div>
+      <div id="b-autres"></div>
+      <div class="brow green"><span>APL (déduction)</span><span id="b-apl">—</span></div>
+      <div class="brow total"><span>Total net mensuel</span><span id="b-total">—</span></div>
+    </div>
+    <div id="alert-box"></div>
+  </div>
+
+  <!-- ONGLET FRAIS D'ENTRÉE -->
+  <div id="panel-entree" class="panel">
+    <div class="section-label">Logement</div>
+    <div class="grid2">
+      <div class="field"><label>Loyer hors charges (€)</label><input type="number" id="loyer2" placeholder="ex: 750" min="0" step="50" inputmode="numeric" oninput="calcEntree()"></div>
+      <div class="field"><label>Type de bail</label><select id="bail" onchange="calcEntree()"><option value="1">Nu (dépôt = 1 mois)</option><option value="2">Meublé (dépôt = 2 mois)</option></select></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Frais d'agence (€)</label><input type="number" id="agence" placeholder="ex: 500" min="0" step="50" inputmode="numeric" oninput="calcEntree()"><span class="hint">Plafonné décret Alur</span></div>
+      <div class="field"><label>Premier loyer CC (€)</label><input type="number" id="premier" placeholder="ex: 810" min="0" step="50" inputmode="numeric" oninput="calcEntree()"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Déménagement (€)</label><input type="number" id="demenagement" placeholder="ex: 300" min="0" step="50" inputmode="numeric" oninput="calcEntree()"></div>
+      <div class="field"><label>Équipement / installation (€)</label><input type="number" id="equipement" placeholder="ex: 200" min="0" step="50" inputmode="numeric" oninput="calcEntree()"></div>
+    </div>
+
+    <div class="section-label">Autres frais</div>
+    <div class="autres-list" id="autres-entree-list"></div>
+    <button class="btn-add" onclick="addAutreEntree()"><i class="ti ti-plus"></i> Ajouter un frais</button>
+
+    <hr class="divider">
+    <div class="section-label" style="margin-top:0">Total à prévoir</div>
+
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Dépôt de garantie</div><div class="metric-value" id="depot">—</div></div>
+      <div class="metric"><div class="metric-label">Total à débourser</div><div class="metric-value" id="total-entree">—</div></div>
+    </div>
+
+    <div class="breakdown">
+      <div class="brow"><span>Dépôt de garantie</span><span id="e-depot">—</span></div>
+      <div class="brow"><span>Frais d'agence</span><span id="e-agence">—</span></div>
+      <div class="brow"><span>Premier loyer CC</span><span id="e-premier">—</span></div>
+      <div class="brow"><span>Déménagement</span><span id="e-demenagement">—</span></div>
+      <div class="brow"><span>Équipement</span><span id="e-equipement">—</span></div>
+      <div id="e-autres"></div>
+      <div class="brow total"><span>Total</span><span id="e-total">—</span></div>
+    </div>
+    <div id="alert-entree"></div>
+  </div>
+
+  <p class="mention">Estimation indicative — les montants réels varient selon votre situation personnelle. Pour l'APL, utilisez le <a class="caf-link" href="https://www.caf.fr" target="_blank" rel="noopener">simulateur officiel de la CAF ↗</a>.</p>
+</div>
+
+<div class="footer">© 2026 Nidio</div>
+
+<script>
+  let autresM = [], autresE = [];
+
+  function fmt(n) {
+    return Math.round(n).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  }
+
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  function addAutre() { autresM.push({ id: Date.now(), label: '', montant: 0 }); renderM(); calc(); }
+  function addAutreEntree() { autresE.push({ id: Date.now(), label: '', montant: 0 }); renderE(); calcEntree(); }
+  function removeM(id) { autresM = autresM.filter(a => a.id !== id); renderM(); calc(); }
+  function removeE(id) { autresE = autresE.filter(a => a.id !== id); renderE(); calcEntree(); }
+
+  function renderM() {
+    const l = document.getElementById('autres-list'); l.innerHTML = '';
+    autresM.forEach(a => {
+      const r = document.createElement('div'); r.className = 'autre-row';
+      r.innerHTML = `<input type="text" placeholder="ex: transport, abonnement…" value="${a.label}" oninput="autresM.find(x=>x.id==${a.id}).label=this.value;calc()"><input type="number" min="0" placeholder="€" inputmode="numeric" value="${a.montant || ''}" oninput="autresM.find(x=>x.id==${a.id}).montant=parseFloat(this.value)||0;calc()"><button class="btn-rm" onclick="removeM(${a.id})" aria-label="Supprimer"><i class="ti ti-x"></i></button>`;
+      l.appendChild(r);
+    });
+  }
+
+  function renderE() {
+    const l = document.getElementById('autres-entree-list'); l.innerHTML = '';
+    autresE.forEach(a => {
+      const r = document.createElement('div'); r.className = 'autre-row';
+      r.innerHTML = `<input type="text" placeholder="ex: état des lieux…" value="${a.label}" oninput="autresE.find(x=>x.id==${a.id}).label=this.value;calcEntree()"><input type="number" min="0" placeholder="€" inputmode="numeric" value="${a.montant || ''}" oninput="autresE.find(x=>x.id==${a.id}).montant=parseFloat(this.value)||0;calcEntree()"><button class="btn-rm" onclick="removeE(${a.id})" aria-label="Supprimer"><i class="ti ti-x"></i></button>`;
+      l.appendChild(r);
+    });
+  }
+
+  function calc() {
+    const loyer = parseFloat(document.getElementById('loyer').value) || 0;
+    const charges = parseFloat(document.getElementById('charges').value) || 0;
+    const assurance = parseFloat(document.getElementById('assurance').value) || 0;
+    const internet = parseFloat(document.getElementById('internet').value) || 0;
+    const energie = parseFloat(document.getElementById('energie').value) || 0;
+    const revenu = parseFloat(document.getElementById('revenu').value) || 0;
+    const apl = parseFloat(document.getElementById('apl').value) || 0;
+    const extras = autresM.reduce((s, a) => s + (a.montant || 0), 0);
+    const brut = loyer + charges + assurance + internet + energie + extras;
+    const net = Math.max(0, brut - apl);
+    const ratio = revenu > 0 ? Math.round((net / revenu) * 100) : 0;
+    const reste = Math.round(revenu - net);
+
+    if (!brut) {
+      ['cout-total','cout-apl','ratio','reste','b-loyer','b-charges','b-assurance','b-internet','b-energie','b-apl','b-total'].forEach(id => document.getElementById(id).textContent = '—');
+      document.getElementById('alert-box').innerHTML = '';
+      return;
+    }
+
+    document.getElementById('cout-total').textContent = fmt(brut);
+    document.getElementById('cout-apl').textContent = fmt(net);
+    const rc = ratio > 40 ? 'bad' : ratio > 33 ? 'warn' : 'ok';
+    document.getElementById('ratio').textContent = ratio + '%';
+    document.getElementById('ratio').className = 'metric-value ' + rc;
+    document.getElementById('reste').textContent = revenu ? fmt(reste) : '—';
+    document.getElementById('reste').className = 'metric-value ' + (revenu ? (reste < 500 ? 'bad' : reste < 900 ? 'warn' : 'ok') : '');
+    document.getElementById('b-loyer').textContent = fmt(loyer);
+    document.getElementById('b-charges').textContent = fmt(charges);
+    document.getElementById('b-assurance').textContent = fmt(assurance);
+    document.getElementById('b-internet').textContent = fmt(internet);
+    document.getElementById('b-energie').textContent = fmt(energie);
+    document.getElementById('b-apl').textContent = apl ? '− ' + fmt(apl) : '—';
+    document.getElementById('b-total').textContent = fmt(net);
+    document.getElementById('b-autres').innerHTML = autresM.map(a => `<div class="brow"><span>${a.label || 'Autre'}</span><span>${fmt(a.montant || 0)}</span></div>`).join('');
+
+    const box = document.getElementById('alert-box');
+    if (!revenu) { box.innerHTML = ''; return; }
+    const msgs = {
+      ok: '<div class="alert ok"><i class="ti ti-circle-check"></i> Budget sain — en dessous du seuil recommandé de 33%.</div>',
+      warn: '<div class="alert warn"><i class="ti ti-info-circle"></i> Entre 33% et 40% — logement serré mais acceptable.</div>',
+      bad: '<div class="alert bad"><i class="ti ti-alert-circle"></i> Dépasse 40% du revenu — situation financièrement risquée.</div>'
+    };
+    box.innerHTML = msgs[rc];
+  }
+
+  function calcEntree() {
+    const loyer = parseFloat(document.getElementById('loyer2').value) || 0;
+    const bail = parseInt(document.getElementById('bail').value) || 1;
+    const agence = parseFloat(document.getElementById('agence').value) || 0;
+    const premier = parseFloat(document.getElementById('premier').value) || 0;
+    const dem = parseFloat(document.getElementById('demenagement').value) || 0;
+    const equip = parseFloat(document.getElementById('equipement').value) || 0;
+    const extras = autresE.reduce((s, a) => s + (a.montant || 0), 0);
+    const depot = loyer * bail;
+    const total = depot + agence + premier + dem + equip + extras;
+
+    if (!loyer && !total) {
+      ['depot','total-entree','e-depot','e-agence','e-premier','e-demenagement','e-equipement','e-total'].forEach(id => document.getElementById(id).textContent = '—');
+      document.getElementById('alert-entree').innerHTML = '';
+      return;
+    }
+
+    document.getElementById('depot').textContent = fmt(depot);
+    document.getElementById('total-entree').textContent = fmt(total);
+    document.getElementById('e-depot').textContent = fmt(depot);
+    document.getElementById('e-agence').textContent = fmt(agence);
+    document.getElementById('e-premier').textContent = fmt(premier);
+    document.getElementById('e-demenagement').textContent = fmt(dem);
+    document.getElementById('e-equipement').textContent = fmt(equip);
+    document.getElementById('e-total').textContent = fmt(total);
+    document.getElementById('e-autres').innerHTML = autresE.map(a => `<div class="brow"><span>${a.label || 'Autre'}</span><span>${fmt(a.montant || 0)}</span></div>`).join('');
+    document.getElementById('alert-entree').innerHTML = total > 3000 ? '<div class="alert warn"><i class="ti ti-info-circle"></i> Budget d\'entrée important — vérifie ton éligibilité à l\'avance Loca-Pass (Action Logement).</div>' : '';
+  }
+</script>
+</body>
+</html>
