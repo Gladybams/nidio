@@ -27,14 +27,11 @@
     html { font-size: 16px; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #EFEDE7;
+      background: var(--cream);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
+      padding: 0;
+      margin: 0;
     }
-    @media (max-width: 480px) { body { padding: 0; background: var(--cream); } }
 
     .app {
       background: var(--cream);
@@ -42,7 +39,7 @@
       border: 0.5px solid var(--cream-border);
       padding: 2rem;
       width: 100%;
-      max-width: 560px;
+      
     }
     @media (max-width: 480px) {
       .app { border-radius: 0; border: none; padding: 1.25rem 1rem; max-width: 100%; }
@@ -201,21 +198,21 @@
     <div class="section-label" style="margin-top:0">Résultat</div>
 
     <div class="metrics">
-      <div class="metric"><div class="metric-label">Coût total brut</div><div class="metric-value" id="cout-total">—</div></div>
-      <div class="metric"><div class="metric-label">Après APL</div><div class="metric-value" id="cout-apl">—</div></div>
-      <div class="metric"><div class="metric-label">% du revenu</div><div class="metric-value" id="ratio">—</div></div>
-      <div class="metric"><div class="metric-label">Reste à vivre</div><div class="metric-value" id="reste">—</div></div>
+      <div class="metric"><div class="metric-label">Coût total brut</div><div class="metric-value" id="cout-total"></div></div>
+      <div class="metric"><div class="metric-label">Après APL</div><div class="metric-value" id="cout-apl"></div></div>
+      <div class="metric"><div class="metric-label">% du revenu</div><div class="metric-value" id="ratio"></div></div>
+      <div class="metric"><div class="metric-label">Reste à vivre</div><div class="metric-value" id="reste"></div></div>
     </div>
 
     <div class="breakdown">
-      <div class="brow"><span>Loyer HC</span><span id="b-loyer">—</span></div>
-      <div class="brow"><span>Charges</span><span id="b-charges">—</span></div>
-      <div class="brow"><span>Assurance</span><span id="b-assurance">—</span></div>
-      <div class="brow"><span>Internet</span><span id="b-internet">—</span></div>
-      <div class="brow"><span>Électricité / gaz</span><span id="b-energie">—</span></div>
+      <div class="brow"><span>Loyer HC</span><span id="b-loyer"></span></div>
+      <div class="brow"><span>Charges</span><span id="b-charges"></span></div>
+      <div class="brow"><span>Assurance</span><span id="b-assurance"></span></div>
+      <div class="brow"><span>Internet</span><span id="b-internet"></span></div>
+      <div class="brow"><span>Électricité / gaz</span><span id="b-energie"></span></div>
       <div id="b-autres"></div>
-      <div class="brow green"><span>APL (déduction)</span><span id="b-apl">—</span></div>
-      <div class="brow total"><span>Total net mensuel</span><span id="b-total">—</span></div>
+      <div class="brow green"><span>APL (déduction)</span><span id="b-apl"></span></div>
+      <div class="brow total"><span>Total net mensuel</span><span id="b-total"></span></div>
     </div>
     <div id="alert-box"></div>
   </div>
@@ -244,18 +241,18 @@
     <div class="section-label" style="margin-top:0">Total à prévoir</div>
 
     <div class="metrics">
-      <div class="metric"><div class="metric-label">Dépôt de garantie</div><div class="metric-value" id="depot">—</div></div>
-      <div class="metric"><div class="metric-label">Total à débourser</div><div class="metric-value" id="total-entree">—</div></div>
+      <div class="metric"><div class="metric-label">Dépôt de garantie</div><div class="metric-value" id="depot"></div></div>
+      <div class="metric"><div class="metric-label">Total à débourser</div><div class="metric-value" id="total-entree"></div></div>
     </div>
 
     <div class="breakdown">
-      <div class="brow"><span>Dépôt de garantie</span><span id="e-depot">—</span></div>
-      <div class="brow"><span>Frais d'agence</span><span id="e-agence">—</span></div>
-      <div class="brow"><span>Premier loyer CC</span><span id="e-premier">—</span></div>
-      <div class="brow"><span>Déménagement</span><span id="e-demenagement">—</span></div>
-      <div class="brow"><span>Équipement</span><span id="e-equipement">—</span></div>
+      <div class="brow"><span>Dépôt de garantie</span><span id="e-depot"></span></div>
+      <div class="brow"><span>Frais d'agence</span><span id="e-agence"></span></div>
+      <div class="brow"><span>Premier loyer CC</span><span id="e-premier"></span></div>
+      <div class="brow"><span>Déménagement</span><span id="e-demenagement"></span></div>
+      <div class="brow"><span>Équipement</span><span id="e-equipement"></span></div>
       <div id="e-autres"></div>
-      <div class="brow total"><span>Total</span><span id="e-total">—</span></div>
+      <div class="brow total"><span>Total</span><span id="e-total"></span></div>
     </div>
     <div id="alert-entree"></div>
   </div>
@@ -263,7 +260,6 @@
   <p class="mention">Estimation indicative — les montants réels varient selon votre situation personnelle. Pour l'APL, utilisez le <a class="caf-link" href="https://www.caf.fr" target="_blank" rel="noopener">simulateur officiel de la CAF ↗</a>.</p>
 </div>
 
-<div class="footer">© 2026 Nidio</div>
 
 <script>
   let autresM = [], autresE = [];
@@ -317,7 +313,7 @@
     const reste = Math.round(revenu - net);
 
     if (!brut) {
-      ['cout-total','cout-apl','ratio','reste','b-loyer','b-charges','b-assurance','b-internet','b-energie','b-apl','b-total'].forEach(id => document.getElementById(id).textContent = '—');
+      ['cout-total','cout-apl','ratio','reste','b-loyer','b-charges','b-assurance','b-internet','b-energie','b-apl','b-total'].forEach(id => document.getElementById(id).textContent = '');
       document.getElementById('alert-box').innerHTML = '';
       return;
     }
@@ -327,14 +323,14 @@
     const rc = ratio > 40 ? 'bad' : ratio > 33 ? 'warn' : 'ok';
     document.getElementById('ratio').textContent = ratio + '%';
     document.getElementById('ratio').className = 'metric-value ' + rc;
-    document.getElementById('reste').textContent = revenu ? fmt(reste) : '—';
+    document.getElementById('reste').textContent = revenu ? fmt(reste) : '';
     document.getElementById('reste').className = 'metric-value ' + (revenu ? (reste < 500 ? 'bad' : reste < 900 ? 'warn' : 'ok') : '');
     document.getElementById('b-loyer').textContent = fmt(loyer);
     document.getElementById('b-charges').textContent = fmt(charges);
     document.getElementById('b-assurance').textContent = fmt(assurance);
     document.getElementById('b-internet').textContent = fmt(internet);
     document.getElementById('b-energie').textContent = fmt(energie);
-    document.getElementById('b-apl').textContent = apl ? '− ' + fmt(apl) : '—';
+    document.getElementById('b-apl').textContent = apl ? '− ' + fmt(apl) : '';
     document.getElementById('b-total').textContent = fmt(net);
     document.getElementById('b-autres').innerHTML = autresM.map(a => `<div class="brow"><span>${a.label || 'Autre'}</span><span>${fmt(a.montant || 0)}</span></div>`).join('');
 
@@ -360,7 +356,7 @@
     const total = depot + agence + premier + dem + equip + extras;
 
     if (!loyer && !total) {
-      ['depot','total-entree','e-depot','e-agence','e-premier','e-demenagement','e-equipement','e-total'].forEach(id => document.getElementById(id).textContent = '—');
+      ['depot','total-entree','e-depot','e-agence','e-premier','e-demenagement','e-equipement','e-total'].forEach(id => document.getElementById(id).textContent = '');
       document.getElementById('alert-entree').innerHTML = '';
       return;
     }
